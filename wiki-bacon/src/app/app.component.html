@@ -3,27 +3,75 @@
         <mat-card class="mat-elevation-z4">
             <mat-card-title class="text-center mt-3">WikiBacon - Grafos 1</mat-card-title>
             <mat-card-content>
-                <p class="m-0 text-center"> Quer testar o <span matTooltip="Define a quantos graus de distância um ator ou atriz está de Kevin Bacon. Aqui nesse projeto, será a distância entre duas páginas da Wikipedia." style="color: rgb(0, 68, 255)">Nr. de Kevin Bacon</span> entre duas páginas da Wikipedia?  <br> Então, vamos começar.</p>     
-                <div class="row p-3">
-                    <mat-form-field class="col-lg-4" appearance="outline">
-                        <mat-label>Página de Origem</mat-label>
-                        <input matInput placeholder="Página de Origem">
-                    </mat-form-field>
-                    <mat-form-field class="col-lg-4" appearance="outline">
-                        <mat-label>Página de Destino</mat-label>
-                        <input matInput placeholder="Página de Destino">
-                    </mat-form-field>
-                    <mat-form-field matTooltip="Digite o máximo da distância que você deseja entre as duas páginas." class="col-lg-4" appearance="outline">
-                        <mat-label>Nr. Máximo de Kevin Bacon</mat-label>
-                        <input matInput placeholder="Nr. Máximo de Kevin Bacon">
-                    </mat-form-field>
-                </div>
-                <div class="row d-flex justify-content-center">
-                    <div class="col-lg-6 d-flex justify-content-center">
-                        <button color="primary" mat-raised-button>Enviar</button>
-                    </div>
-                </div>
-                
+                <mat-tab-group dynamicHeight [selectedIndex]="1">
+                    <mat-tab label="Início" class="p-3">
+                        <p class="m-0 text-center"> Quer testar o <span
+                                matTooltip="Define a quantos graus de distância um ator ou atriz está de Kevin Bacon. Aqui nesse projeto, será a distância entre duas páginas da Wikipedia."
+                                style="color: rgb(0, 68, 255)">Nr. de Kevin Bacon</span> entre duas páginas da
+                            Wikipedia? <br> Então, vamos começar.</p>
+                        <div class="row p-3">
+                            <mat-form-field class="col-lg-4" appearance="outline">
+                                <mat-label>Página de Origem</mat-label>
+                                <input matInput placeholder="Página de Origem">
+                            </mat-form-field>
+                            <mat-form-field class="col-lg-4" appearance="outline">
+                                <mat-label>Página de Destino</mat-label>
+                                <input matInput placeholder="Página de Destino">
+                            </mat-form-field>
+                            <mat-form-field
+                                matTooltip="Digite o máximo da distância que você deseja entre as duas páginas."
+                                class="col-lg-4" appearance="outline">
+                                <mat-label>Nr. Máximo de Kevin Bacon</mat-label>
+                                <input matInput placeholder="Nr. Máximo de Kevin Bacon">
+                            </mat-form-field>
+                        </div>
+                        <div class="row d-flex justify-content-center">
+                            <div class="col-lg-6 d-flex justify-content-center">
+                                <button color="primary" mat-raised-button>Enviar</button>
+                            </div>
+                        </div>
+                    </mat-tab>
+                    <mat-tab class="d-flex justify-content-center" label="Resultado" class="p-3">
+                        <ngx-graph [update$]="update$" [nodes]="nodes" [links]="edges" layout="dagre" [animate]="true">
+                            <ng-template #defsTemplate>
+                                <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4"
+                                    markerHeight="4" orient="auto">
+                                    <svg:path d="M0,-5L10,0L0,5" class="arrow-head" />
+                                </svg:marker>
+                            </ng-template>
+                            <ng-template #nodeTemplate let-node>
+                                <svg:g class="node">
+                                    <svg:rect [attr.width]="node.dimension.width" [attr.height]="node.dimension.height"
+                                        [attr.fill]="node.data.color" />
+                                    <svg:text alignment-baseline="central" [attr.x]="10"
+                                        [attr.y]="node.dimension.height / 2">
+                                        {{node.label}}
+                                    </svg:text>
+                                </svg:g>
+                            </ng-template>
+
+                            <ng-template #linkTemplate let-link>
+
+                                <svg:g class="edge">
+                                    <svg:path [attr.stroke]="getStrokeLine(link.id)" class="line" stroke-width="2" marker-end="url(#arrow)"></svg:path>
+                                    <svg:text class="edge-label" text-anchor="middle">
+                                        <textPath class="text-path" [attr.href]="'#' + link.id"
+                                            [style.dominant-baseline]="link.dominantBaseline" startOffset="50%">
+                                            {{link.label}}
+                                        </textPath>
+                                    </svg:text>
+                                </svg:g>
+                            </ng-template>
+                        </ngx-graph>
+
+                        <div class="row d-flex justify-content-center">
+                            <button (click)="updatePonto()" mat-raised-button color="primary"> Adicionar Ponto </button>
+                            {{nodes | json}}
+                        </div>
+                    </mat-tab>
+                </mat-tab-group>
+
+
             </mat-card-content>
         </mat-card>
     </div>
