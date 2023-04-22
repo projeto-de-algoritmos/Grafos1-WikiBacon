@@ -1,32 +1,28 @@
-<div class="container-fluid my-auto">
-    <mat-toolbar class="mat-elevation-z5 rounded my-3" style="background-color: rgba(128,128,128,0.66)">
-        <p class="m-0 text-center w-100 fw-light">WikiBacon - Grafos 1</p>
-    </mat-toolbar>
-    <mat-accordion>
-        <mat-expansion-panel hideToggle expanded="true">
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    This is the expansion title
-                </mat-panel-title>
-                <mat-panel-description>
-                    This is a summary of the content
-                </mat-panel-description>
-            </mat-expansion-panel-header>
-            <div style="height: 750px">
-                oi
-            </div>
-        </mat-expansion-panel>
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Self aware panel
-                </mat-panel-title>
-                <mat-panel-description>
-                </mat-panel-description>
-            </mat-expansion-panel-header>
-            <p>I'm visible because I am open</p>
-        </mat-expansion-panel>
-    </mat-accordion>
-
-
+<div class="container-fluid h-100 d-flex flex-column">
+    <div class="my-auto mx-card">
+        <mat-card class="mat-elevation-z4">
+            <mat-card-title class="text-center mt-3">WikiBacon - Grafos 1</mat-card-title>
+            <mat-card-content>
+                <p class="m-0 text-center"> Quer testar o <span matTooltip="Define a quantos graus de distância um ator ou atriz está de Kevin Bacon. Aqui nesse projeto, será a distância entre duas páginas da Wikipedia." style="color: rgb(0, 68, 255)">Nr. de Kevin Bacon</span> entre duas páginas da Wikipedia?  <br> Então, vamos começar.</p>     
+                <div class="row p-3">
+                    <mat-form-field class="col-lg-4" appearance="outline">
+                        <mat-label>Página de Origem</mat-label>
+                        <input matInput placeholder="Página de Origem">
+                    </mat-form-field>
+                    <mat-form-field class="col-lg-4" appearance="outline">
+                        <mat-label>Página de Destino</mat-label>
+                        <input matInput placeholder="Página de Destino">
+                    </mat-form-field>
+                    <mat-form-field matTooltip="Digite o máximo da distância que você deseja entre as duas páginas." class="col-lg-4" appearance="outline">
+                        <mat-label>Nr. Máximo de Kevin Bacon</mat-label>
+                        <input matInput placeholder="Nr. Máximo de Kevin Bacon">
+                    </mat-form-field>
+                </div>
+                <div class="row d-flex justify-content-center">
+                    <button class="col-lg-4" color="primary" mat-raised-button>Enviar</button>
+                </div>
+            
+            </mat-card-content>
+        </mat-card>
+    </div>
 </div>
