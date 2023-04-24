@@ -30,9 +30,17 @@ Descreva os objetivos do seu projeto e como ele funciona.
 Adicione 3 ou mais screenshots do projeto em funcionamento.
 
 ## Instalação 
-**Linguagem**: xxxxxx<br>
-**Framework**: (caso exista)<br>
-Descreva os pré-requisitos para rodar o seu projeto e os comandos necessários.
+**Linguagem**: Typescript<br>
+**Framework**: Angular<br>
+
+Certifique-se de ter o NodeJs (versão >= 18.0.0) instalado em sua máquina e
+rode os seguinter comandos em seu terminal:
+
+```bash
+cd wiki-bacon 
+npm install --legacy-peer-deps
+
+```
 
 ## Uso 
 Explique como usar seu projeto caso haja algum passo a passo após o comando de execução.
