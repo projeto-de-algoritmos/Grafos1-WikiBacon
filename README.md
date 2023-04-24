@@ -34,7 +34,7 @@ Adicione 3 ou mais screenshots do projeto em funcionamento.
 **Framework**: Angular<br>
 
 Certifique-se de ter o NodeJs (versão >= 18.0.0) instalado em sua máquina e
-rode os seguinter comandos em seu terminal:
+rode os seguintes comandos em seu terminal:
 
 ```bash
 cd wiki-bacon 
