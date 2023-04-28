@@ -14,8 +14,8 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatTabsModule } from "@angular/material/tabs"
 import { NgxGraphModule } from '@swimlane/ngx-graph';
-import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -25,6 +25,7 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    HttpClientModule,
     MatToolbarModule,
     MatFormFieldModule,
     MatInputModule,
