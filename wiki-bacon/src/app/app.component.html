@@ -37,7 +37,7 @@
                         style="width: 100%; height: 100%">
                         <ngx-graph [autoZoom]="false" [view]="[1280,720]" [zoomLevel]="1"
                             [showMiniMap]="true" [autoCenter]="false" [update$]="update$" [nodes]="nodes"
-                            [links]="edges" layout="dagre" [animate]="true" [enableZoom]="false"
+                            [links]="edges" layout="d3ForceDirected" [animate]="true" [enableZoom]="false"
                             [draggingEnabled]="true">
                             <ng-template #defsTemplate>
                                 <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4"

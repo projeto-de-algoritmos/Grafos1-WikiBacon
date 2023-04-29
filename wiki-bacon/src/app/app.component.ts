@@ -31,13 +31,13 @@ export class AppComponent implements OnInit {
     this.testeBfs()
   }
   testeBfs() {
-    const graph: Graph = { nodes: [{ id: 'node1', label: 'Node1' }, { id: 'node2', label: 'Node2' }, { id: 'node3', label: 'Node3' }, { id: 'node4', label: 'Node4' }, { id: 'node5', label: 'Node 5' }, { id: 'node6', label: 'Node 6' }], edges: [{ id: 'edge1', source: 'node1', target: 'node2' }, { id: 'edge2', source: 'node1', target: 'node3' }, { id: 'edgeNova', source: 'node2', target: 'node3' }, { id: 'edge3', source: 'node3', target: 'node5' }, { id: 'edge6', source: 'node2', target: 'node4' }, { id: 'edge8', source: 'node4', target: 'node6' }] }
+    const graph: Graph = { nodes: [{ id: 'node1', label: 'Node1' }, { id: 'node2', label: 'Node2' }, { id: 'node3', label: 'Node3' }, { id: 'node4', label: 'Node4' }, { id: 'node5', label: 'Node 5' }, { id: 'node6', label: 'Node 6' }], edges: [{ id: 'edge1', source: 'node1', target: 'node2' }, { id: 'edge2', source: 'node1', target: 'node3' }, { id: 'edgeNova', source: 'node2', target: 'node3' }, { id: 'edge3', source: 'node3', target: 'node5' }, { id: 'edge6', source: 'node2', target: 'node4' }, { id: 'edge8', source: 'node4', target: 'node6' }, { id: 'edge9', source: 'node2', target: 'node6' }] }
     this.nodes = graph.nodes
     this.edges = graph.edges
     const bfsTree: Graph = this.graphService.bfs(graph, this.nodes.find(n => n.id == 'node1')!, this.nodes.find(n => n.id == 'node4')!)
     bfsTree.edges.forEach(e => {
       if (!bfsTree.nodes.find(n => n.id == e.target)) {
-        bfsTree.nodes.push({id: e.target, label: e.target.charAt(0).toUpperCase() + e.target.slice(1)})
+        bfsTree.nodes.push({ id: e.target, label: e.target.charAt(0).toUpperCase() + e.target.slice(1) })
       }
     });
     this.edgesUtilizadas = []
