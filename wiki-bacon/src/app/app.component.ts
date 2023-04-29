@@ -1,9 +1,10 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Edge, Graph, Node } from '@swimlane/ngx-graph';
+import { DagreClusterLayout, Edge, Graph, Layout, Node } from '@swimlane/ngx-graph';
 import { Subject } from 'rxjs';
 import { WikipediaService } from './wikipedia.service';
 import { parse } from 'angular-html-parser';
+import { GraphService } from './service/graph.service';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,7 @@ export class AppComponent implements OnInit {
 
   update$: Subject<boolean> = new Subject()
   zoomToFit$: Subject<boolean> = new Subject()
-
+  edgesUtilizadas: Edge[] = []
   nodes: Node[] = [
   ]
 
@@ -24,14 +25,36 @@ export class AppComponent implements OnInit {
   public getScreenHeight: any;
 
   ngOnInit() {
-    this.getScreenWidth = window.innerWidth;
-    this.getScreenHeight = window.innerHeight;
+    this.getScreenWidth = window.screen.availWidth;
+    this.getScreenHeight = window.screen.availHeight;
+
+    this.testeBfs()
+  }
+  testeBfs() {
+    const graph: Graph = { nodes: [{ id: 'node1', label: 'Node1' }, { id: 'node2', label: 'Node2' }, { id: 'node3', label: 'Node3' }, { id: 'node4', label: 'Node4' }, { id: 'node5', label: 'Node 5' }, { id: 'node6', label: 'Node 6' }], edges: [{ id: 'edge1', source: 'node1', target: 'node2' }, { id: 'edge2', source: 'node1', target: 'node3' }, { id: 'edgeNova', source: 'node2', target: 'node3' }, { id: 'edge3', source: 'node3', target: 'node5' }, { id: 'edge6', source: 'node2', target: 'node4' }, { id: 'edge8', source: 'node4', target: 'node6' }] }
+    this.nodes = graph.nodes
+    this.edges = graph.edges
+    const bfsTree: Graph = this.graphService.bfs(graph, this.nodes.find(n => n.id == 'node1')!, this.nodes.find(n => n.id == 'node4')!)
+    bfsTree.edges.forEach(e => {
+      if (!bfsTree.nodes.find(n => n.id == e.target)) {
+        bfsTree.nodes.push({id: e.target, label: e.target.charAt(0).toUpperCase() + e.target.slice(1)})
+      }
+    });
+    this.edgesUtilizadas = []
+    this.nodes = bfsTree.nodes
+    this.edges = bfsTree.edges
+    const nodesUtilizados = this.graphService.dfsPrepare(bfsTree, this.nodes.find(n => n.id == 'node1')!, this.nodes.find(n => n.id == 'node4')!).split(' ')
+    for (let i = 0; i < nodesUtilizados.length - 2; i++) {
+      this.edgesUtilizadas.push(this.edges.find(e => e.source == nodesUtilizados[i] && e.target == nodesUtilizados[i + 1])!)
+    }
+
+    this.update$.next
   }
 
   @HostListener('window:resize', ['$event'])
   onWindowResize() {
-    this.getScreenWidth = window.innerWidth;
-    this.getScreenHeight = window.innerHeight;
+    this.getScreenWidth = window.screen.availWidth;
+    this.getScreenHeight = window.screen.availWidth;
   }
 
   edgesMenorCaminho: string[] = []
@@ -46,17 +69,8 @@ export class AppComponent implements OnInit {
   htmlPaginaDestino?: string;
   htmlPaginaOrigem?: string;
 
-  constructor(private readonly wikipediaService: WikipediaService) {
+  constructor(private readonly wikipediaService: WikipediaService, private readonly graphService: GraphService) {
 
-
-  }
-
-
-  updatePonto(pagina: string, paginaPai: string, i: number) {
-    this.nodes.push({ id: `novoNode${pagina}`, label: pagina, data: { color: Math.floor(Math.random() * 16777215).toString(16) } })
-    let idEdge = 'novaEdge' + (Date.now() + i)
-    this.edges.push({ id: idEdge, source: paginaPai, target: `novoNode${pagina}` })
-    this.edgesMenorCaminho.push(idEdge)
 
   }
 
@@ -67,23 +81,12 @@ export class AppComponent implements OnInit {
 
   async send() {
 
-    this.nodes.push({ id: `paginaOrigem${this.form.get('paginaOrigem')?.value}`, label: this.form.get('paginaOrigem')?.value, data: { color: Math.floor(Math.random() * 16777215).toString(16) } })
-    let idNodePai = `paginaOrigem${this.form.get('paginaOrigem')?.value}`;
-    let nodeOrigem = this.form.get('paginaOrigem')?.value;
-    let htmlPage = await this.wikipediaService.getHtmlPage(nodeOrigem);
-    let dom = new DOMParser().parseFromString(htmlPage, 'text/html');
-    let listaLinks = Array.from(dom.getElementsByTagName('a')).filter(a => a.rel == 'mw:WikiLink' && a.attributes.getNamedItem('href')?.value.startsWith('./') && this.validLink(a) && !a.classList.contains('mw-disambig') &&  a.innerText);
-    listaLinks.slice(0, Math.min(listaLinks.length, 5)).forEach((l, index) => this.updatePonto(l.innerText, idNodePai, index));
-    
-    this.update$.next(true);
+  }
+
+  colorEdge(tId: string) {
+    const color = this.edgesUtilizadas.map(e => e.id).includes(tId) ? 'red' : 'black'
+    return color;
+  }
 
 
-  }
-  validLink(a: HTMLAnchorElement) {
-    const failedLinks = ['Wikipédia:', 'Ficheiro:', 'Categoria:', 'Predefinição:', 'Wikiquote', 'Especial:', 'Wikcionário']
-    for (const l of failedLinks) {
-      if (a.attributes.getNamedItem('href')?.value.search(l) != -1 || a.parentNode?.nodeName == "CITE" || a.parentNode?.nodeName == "I" || a.parentNode?.nodeName == "small") return false;
-    }
-    return true;
-  }
 }
