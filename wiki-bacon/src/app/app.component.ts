@@ -51,6 +51,45 @@ export class AppComponent implements OnInit {
 
   }
 
+  async buildGraph(startPage: string) {
+    const queue: string[] = []
+    const nodeSet = new Set<string>()
+    const maxLayer = this.form.get('camadas')?.value
+    let layer = 0
+    queue.push(startPage)
+    this.nodes.push({ id: startPage, label: startPage, data: { color: Math.floor(Math.random() * 16777215).toString(16) } })
+    nodeSet.add(startPage)
+    while(queue.length > 0 && layer < maxLayer) {
+      let layerSize = queue.length
+      while(layerSize-- > 0) {
+        console.log("ok")
+        let currPage = queue.shift()
+        let htmlPage = ""
+        try {
+          htmlPage = await this.wikipediaService.getHtmlPage(currPage!);
+        } catch(e) {
+          continue
+        }
+        let dom = new DOMParser().parseFromString(htmlPage, 'text/html');
+        let listaLinks = Array.from(dom.getElementsByTagName('a')).filter(a => 
+          a.rel == 'mw:WikiLink' && 
+          a.attributes.getNamedItem('href')?.value.startsWith('./') && 
+          this.validLink(a) && 
+          !a.classList.contains('mw-disambig') && 
+          a.innerText);
+        listaLinks.slice(0, Math.min(listaLinks.length, 5)).forEach((l, index) => {
+          let childPage = this.getNameFromUrl(l.pathname)
+          if(!nodeSet.has(childPage)) {
+            queue.push(childPage)
+            nodeSet.add(childPage)
+            this.nodes.push({ id: childPage, label: l.innerHTML, data: { color: Math.floor(Math.random() * 16777215).toString(16) } })
+            this.edges.push({ id: `${currPage}-${childPage}`, source: currPage!, target: childPage })
+          }
+        });
+      }
+      layer++
+    }
+  }
 
   updatePonto(pagina: string, paginaPai: string, i: number) {
     this.nodes.push({ id: `novoNode${pagina}`, label: pagina, data: { color: Math.floor(Math.random() * 16777215).toString(16) } })
@@ -76,9 +115,8 @@ export class AppComponent implements OnInit {
     listaLinks.slice(0, Math.min(listaLinks.length, 5)).forEach((l, index) => this.updatePonto(l.innerText, idNodePai, index));
     
     this.update$.next(true);
-
-
   }
+
   validLink(a: HTMLAnchorElement) {
     const failedLinks = ['Wikipédia:', 'Ficheiro:', 'Categoria:', 'Predefinição:', 'Wikiquote', 'Especial:', 'Wikcionário']
     for (const l of failedLinks) {
@@ -86,4 +124,9 @@ export class AppComponent implements OnInit {
     }
     return true;
   }
+
+  getNameFromUrl(url: string) {
+    return url.replace('/wiki/', '')
+  }
+
 }
