@@ -35,10 +35,10 @@
                     </mat-tab>
                     <mat-tab class="d-flex justify-content-center" label="Resultado" class="p-3"
                         style="width: 100%; height: 100%">
-                        <ngx-graph [autoZoom]="false" [view]="[getScreenWidth, getScreenWidth]" [zoomLevel]="1"
+                        <ngx-graph [autoZoom]="false" [view]="[1280,720]" [zoomLevel]="1"
                             [showMiniMap]="true" [autoCenter]="false" [update$]="update$" [nodes]="nodes"
-                            [links]="edges" layout="dagre" [animate]="false" [enableZoom]="false"
-                            [draggingEnabled]="false">
+                            [links]="edges" layout="d3ForceDirected" [animate]="true" [enableZoom]="false"
+                            [draggingEnabled]="true">
                             <ng-template #defsTemplate>
                                 <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4"
                                     markerHeight="4" orient="auto">
@@ -59,8 +59,8 @@
                             <ng-template #linkTemplate let-link>
 
                                 <svg:g class="edge">
-                                    <svg:path [attr.stroke]="'black'" class="line" stroke-width="2"
-                                        marker-end="url(#arrow)"></svg:path>
+                                    <svg:path [attr.stroke]="colorEdge(link.id)" class="line" stroke-width="2"
+                                         marker-end="url(#arrow)"></svg:path>
                                     <svg:text class="edge-label" text-anchor="middle">
                                         <textPath class="text-path" [attr.href]="'#' + link.id"
                                             [style.dominant-baseline]="link.dominantBaseline" startOffset="50%">
