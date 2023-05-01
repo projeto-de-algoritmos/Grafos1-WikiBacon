@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { DagreClusterLayout, Edge, Graph, Layout, Node } from '@swimlane/ngx-graph';
-import { Subject } from 'rxjs';
+import { Subject, debounceTime } from 'rxjs';
 import { WikipediaService } from './wikipedia.service';
 import { parse } from 'angular-html-parser';
 import { GraphService } from './service/graph.service';
@@ -30,6 +30,25 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.getScreenWidth = window.screen.availWidth;
     this.getScreenHeight = window.screen.availHeight;
+
+    this.form.get('paginaDestino')?.valueChanges.pipe(debounceTime(2500)).subscribe(async (value) => {
+      try {
+        await this.wikipediaService.getHtmlPage(value)
+      } catch (e) {
+        this.snackbar.open('Página de Destino não é uma Página de Wikipedia', 'OK!')
+        this.form.get('paginaDestino')?.setValue(null)
+      }
+    })
+
+    this.form.get('paginaOrigem')?.valueChanges.pipe(debounceTime(2500)).subscribe(async (value) => {
+      try {
+        await this.wikipediaService.getHtmlPage(value)
+      } catch (e) {
+        this.snackbar.open('Página de Origem não é uma Página de Wikipedia', 'OK!')
+        this.form.get('paginaOrigem')?.setValue(null)
+
+      }
+    })
   }
 
 

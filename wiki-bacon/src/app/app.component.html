@@ -23,8 +23,9 @@
                             <mat-form-field
                                 matTooltip="Digite o máximo da distância que você deseja entre as duas páginas."
                                 class="col-lg-4" appearance="outline">
-                                <mat-label>Nr. Máximo de Kevin Bacon</mat-label>
+                                <mat-label>Nr. Máximo de Kevin Bacon (Máximo: 3 e Mínimo: 1)</mat-label>
                                 <input formControlName="camadas" matInput placeholder="Nr. Máximo de Kevin Bacon">
+                                <mat-error *ngIf="form.get('camadas')?.invalid">O Número de Camadas deve estar entre 1 e 3</mat-error>
                             </mat-form-field>
                         </div>
                         <div class="row d-flex justify-content-center">
