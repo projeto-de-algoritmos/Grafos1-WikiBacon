@@ -22,7 +22,18 @@ O aplicativo Wiki Bacon é útil para usuários que desejam explorar a conexão 
 
 ## Screenshots
 
-Adicione 3 ou mais screenshots do projeto em funcionamento.
+### Formulário:
+
+![formulário](./assets/image1.jpeg)
+
+### Resultado de uma busca bem sucedida:
+
+![formulário](./assets/image2.jpeg)
+![formulário](./assets/image4.jpeg)
+
+### Resultado de uma busca em que o menor caminho não foi encontrado:
+
+![formulário](./assets/image3.jpeg)
 
 ## Instalação
 
