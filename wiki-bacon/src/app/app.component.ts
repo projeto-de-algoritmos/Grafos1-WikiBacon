@@ -19,8 +19,7 @@ export class AppComponent implements OnInit {
   zoomToFit$: Subject<boolean> = new Subject()
   loadingStatus: boolean = false
   edgesUtilizadas: Edge[] = []
-  nodes: Node[] = [
-  ]
+  nodes: Node[] = []
 
   edges: Edge[] = []
 
