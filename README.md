@@ -48,6 +48,14 @@ npm install --legacy-peer-deps
 
 ```
 
+## Como rodar localmente
+
+Após instalar as dependências utilizando o comando acima, para rodar o projeto, bastar digitar o seguinte comando na pasta wiki-bacon:
+
+```bash
+npm run start
+```
+
 ## Uso
 
 A maneira mais fácil de utilizar o app é visitando o [link do github pages](https://projeto-de-algoritmos.github.io/Grafos1-WikiBacon/) em que o projeto está hospedado.
