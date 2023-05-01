@@ -1,4 +1,4 @@
-import fs from 'fs'
+const fs = require('fs')
 
 const MAX_PAGES = parseInt(process.argv[2]) || 1000
 
@@ -93,7 +93,7 @@ async function startFetching() {
   })
   console.log(MAX_PAGES)
   while (queue.length > 0) {
-    let currPage = queue.pop()
+    let currPage = queue.shift()
     console.log(`[${++count}] Fetching: ${currPage}`)
     let linkedPages = await parseLinks(currPage)
     if (wikiPagesMap.size >= MAX_PAGES) continue
