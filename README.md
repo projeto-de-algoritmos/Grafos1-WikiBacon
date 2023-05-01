@@ -8,7 +8,7 @@
 | Matrícula  | Aluno                        |
 | ---------- | ---------------------------- |
 | 19/0102390 | André Macedo Rodrigues Alves |
-| xx/xxxxxx  | Guilherme Brito -            |
+| 19/0108011 | Guilherme Brito Vilas - Bôas |
 
 ## Sobre
 
