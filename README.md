@@ -40,7 +40,19 @@ npm install --legacy-peer-deps
 
 ## Uso
 
-Explique como usar seu projeto caso haja algum passo a passo após o comando de execução.
+A maneira mais fácil de utilizar o app é visitando o [link do github pages](https://projeto-de-algoritmos.github.io/Grafos1-WikiBacon/) em que o projeto está hospedado.
+
+No formulário da aba "Início", indique a página de origem e destino (em português), e o número de camadas que você quer procurar. É importante lembrar que os nomes devem estar iguais aos encontrados na url da Wikipédia BR. Por exemplo:
+
+Vamos supor que um usuário queira utilizar a seguinte página como origem:
+
+https://pt.wikipedia.org/wiki/Kevin_Bacon
+
+Ele deverá digitar no campo "Página Origem" do formulário apenas: `Kevin_Bacon`
+
+Seguindo o padrão encontrado após o path "/wiki/" da url.
+
+Após preencher todos os campos, basta clicar em `Enviar` que o algoritmo começará a rodar e, após alguns segundos, irá retornar o grafo gerado.
 
 ## Outros
 
