@@ -1,10 +1,11 @@
-import { Component, HostListener, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { DagreClusterLayout, Edge, Graph, Layout, Node } from '@swimlane/ngx-graph';
 import { Subject } from 'rxjs';
 import { WikipediaService } from './wikipedia.service';
 import { parse } from 'angular-html-parser';
 import { GraphService } from './service/graph.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,9 @@ import { GraphService } from './service/graph.service';
 export class AppComponent implements OnInit {
 
   update$: Subject<boolean> = new Subject()
+  statusBotao: string = 'Enviar';
   zoomToFit$: Subject<boolean> = new Subject()
+  loadingStatus: boolean = false
   edgesUtilizadas: Edge[] = []
   nodes: Node[] = [
   ]
@@ -23,33 +26,13 @@ export class AppComponent implements OnInit {
 
   public getScreenWidth: any;
   public getScreenHeight: any;
+  selectedIndex: number = 0;
 
   ngOnInit() {
     this.getScreenWidth = window.screen.availWidth;
     this.getScreenHeight = window.screen.availHeight;
+  }
 
-    this.testeBfs()
-  }
-  testeBfs() {
-    const graph: Graph = { nodes: [{ id: 'node1', label: 'Node1' }, { id: 'node2', label: 'Node2' }, { id: 'node3', label: 'Node3' }, { id: 'node4', label: 'Node4' }, { id: 'node5', label: 'Node 5' }, { id: 'node6', label: 'Node 6' }], edges: [{ id: 'edge1', source: 'node1', target: 'node2' }, { id: 'edge2', source: 'node1', target: 'node3' }, { id: 'edgeNova', source: 'node2', target: 'node3' }, { id: 'edge3', source: 'node3', target: 'node5' }, { id: 'edge6', source: 'node2', target: 'node4' }, { id: 'edge8', source: 'node4', target: 'node6' }, { id: 'edge9', source: 'node2', target: 'node6' }] }
-    this.nodes = graph.nodes
-    this.edges = graph.edges
-    const bfsTree: Graph = this.graphService.bfs(graph, this.nodes.find(n => n.id == 'node1')!, this.nodes.find(n => n.id == 'node4')!)
-    bfsTree.edges.forEach(e => {
-      if (!bfsTree.nodes.find(n => n.id == e.target)) {
-        bfsTree.nodes.push({ id: e.target, label: e.target.charAt(0).toUpperCase() + e.target.slice(1) })
-      }
-    });
-    this.edgesUtilizadas = []
-    this.nodes = bfsTree.nodes
-    this.edges = bfsTree.edges
-    const nodesUtilizados = this.graphService.dfsPrepare(bfsTree, this.nodes.find(n => n.id == 'node1')!, this.nodes.find(n => n.id == 'node4')!).split(' ')
-    for (let i = 0; i < nodesUtilizados.length - 2; i++) {
-      this.edgesUtilizadas.push(this.edges.find(e => e.source == nodesUtilizados[i] && e.target == nodesUtilizados[i + 1])!)
-    }
-    console.log(this.edgesUtilizadas)
-    this.update$.next
-  }
 
   @HostListener('window:resize', ['$event'])
   onWindowResize() {
@@ -61,18 +44,24 @@ export class AppComponent implements OnInit {
 
   form: FormGroup = new FormGroup(
     {
-      paginaDestino: new FormControl(),
-      paginaOrigem: new FormControl(),
-      camadas: new FormControl()
+      paginaDestino: new FormControl(null, Validators.required),
+      paginaOrigem: new FormControl(null, Validators.required),
+      camadas: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(3)])
     }
   )
   htmlPaginaDestino?: string;
   htmlPaginaOrigem?: string;
 
-  constructor(private readonly wikipediaService: WikipediaService, private readonly graphService: GraphService) {
+
+  constructor(private changeDetector: ChangeDetectorRef, private readonly wikipediaService: WikipediaService, private readonly graphService: GraphService, private readonly snackbar: MatSnackBar) {
 
 
   }
+
+  openSnackBar() {
+    this.snackbar.open(`Pàgina: ${this.form.get('paginaDestino')?.value} não encontrada.`, 'Ok!', { duration: 2000 })
+  }
+
 
   async buildGraph(startPage: string) {
     const queue: string[] = []
@@ -80,32 +69,34 @@ export class AppComponent implements OnInit {
     const maxLayer = this.form.get('camadas')?.value
     let layer = 0
     queue.push(startPage)
-    this.nodes.push({ id: startPage, label: startPage, data: { color: Math.floor(Math.random() * 16777215).toString(16) } })
+    this.nodes = []
+    this.edges = []
+
+    this.nodes.push({ id: startPage, label: startPage.replaceAll("_", " ").toLowerCase(), data: { color: Math.floor(Math.random() * 16777215).toString(16) } })
     nodeSet.add(startPage)
-    while(queue.length > 0 && layer < maxLayer) {
+    while (queue.length > 0 && layer < maxLayer) {
       let layerSize = queue.length
-      while(layerSize-- > 0) {
-        console.log("ok")
+      while (layerSize-- > 0) {
         let currPage = queue.shift()
         let htmlPage = ""
         try {
           htmlPage = await this.wikipediaService.getHtmlPage(currPage!);
-        } catch(e) {
+        } catch (e) {
           continue
         }
         let dom = new DOMParser().parseFromString(htmlPage, 'text/html');
-        let listaLinks = Array.from(dom.getElementsByTagName('a')).filter(a => 
-          a.rel == 'mw:WikiLink' && 
-          a.attributes.getNamedItem('href')?.value.startsWith('./') && 
-          this.validLink(a) && 
-          !a.classList.contains('mw-disambig') && 
-          a.innerText);
-        listaLinks.slice(0, Math.min(listaLinks.length, 5)).forEach((l, index) => {
+        let listaLinks = Array.from(dom.getElementsByTagName('a')).filter(a =>
+          a.rel == 'mw:WikiLink' &&
+          a.attributes.getNamedItem('href')?.value.startsWith('./') &&
+          this.validLink(a) &&
+          !a.classList.contains('mw-disambig') &&
+          a.innerText && !a.innerHTML.includes('<span'));
+        listaLinks.slice(0, Math.min(listaLinks.length, 5)).forEach((l) => {
           let childPage = this.getNameFromUrl(l.pathname)
-          if(!nodeSet.has(childPage)) {
+          if (!nodeSet.has(childPage)) {
             queue.push(childPage)
             nodeSet.add(childPage)
-            this.nodes.push({ id: childPage, label: l.innerHTML, data: { color: Math.floor(Math.random() * 16777215).toString(16) } })
+            this.nodes.push({ id: childPage, label: childPage.replaceAll("_", " ").toLowerCase(), data: { color: Math.floor(Math.random() * 16777215).toString(16) } })
             this.edges.push({ id: `${currPage}-${childPage}`, source: currPage!, target: childPage })
           }
         });
@@ -120,10 +111,56 @@ export class AppComponent implements OnInit {
   }
 
   async send() {
+    this.edgesUtilizadas = []
+    this.loadingStatus = true
+    this.statusBotao = "Construindo Grafo das Páginas ..."
+    this.changeDetector.detectChanges()
+    await this.buildGraph(this.form.get('paginaOrigem')?.value)
+    const graph: Graph = { nodes: this.nodes, edges: this.edges }
+    if (!this.nodes.find(n => n.label == this.form.get('paginaDestino')?.value.toLowerCase())!) {
+      this.openSnackBar()
+      this.update$.next(true)
+      this.statusBotao = "Enviar"
+      this.loadingStatus = false
+      this.changeDetector.detectChanges()
+      this.selectedIndex++;
+    } else {
+      const bfsTree = this.graphService.bfs(graph, this.nodes.find(n => n.label == this.form.get('paginaOrigem')?.value.toLowerCase())!, this.nodes.find(n => n.label == this.form.get('paginaDestino')?.value.toLowerCase())!)
+      this.statusBotao = "Construindo BFS Tree através de uma BFS no Grafo Gerado ..."
+      this.changeDetector.detectChanges()
+
+      bfsTree.edges.forEach(e => {
+        if (!bfsTree.nodes.find(n => n.id == e.target)) {
+          bfsTree.nodes.push({ id: e.target, label: e.target.replaceAll("_", " ").toLowerCase() })
+        }
+      });
+
+      this.nodes = bfsTree.nodes
+      this.edges = bfsTree.edges
+
+
+
+      const nodesUtilizados = this.graphService.dfsPrepare(bfsTree, this.nodes.find(n => n.label == this.form.get('paginaOrigem')?.value.toLowerCase())!, this.nodes.find(n => n.label == this.form.get('paginaDestino')?.value.toLowerCase())!).split('->')
+      this.statusBotao = "Rodando uma DFS na BFS Tree para encontrar o menor caminho"
+      this.changeDetector.detectChanges()
+
+      for (let i = 0; i < nodesUtilizados.length - 2; i++) {
+        this.edgesUtilizadas.push(this.edges.find(e => e.source == nodesUtilizados[i] && e.target == nodesUtilizados[i + 1])!)
+      }
+      this.update$.next(true)
+      this.statusBotao = "Enviar"
+      this.changeDetector.detectChanges()
+
+      this.loadingStatus = false
+
+      this.selectedIndex++;
+    }
+
+
   }
 
   validLink(a: HTMLAnchorElement) {
-    const failedLinks = ['Wikipédia:', 'Ficheiro:', 'Categoria:', 'Predefinição:', 'Wikiquote', 'Especial:', 'Wikcionário']
+    const failedLinks = ['Wikipédia:', 'Ficheiro:', 'Categoria:', 'Predefinição:', 'Predefinição_Discussão:', 'Wikiquote', 'Especial:', 'Wikcionário', ':Infocaixa']
     for (const l of failedLinks) {
       if (a.attributes.getNamedItem('href')?.value.search(l) != -1 || a.parentNode?.nodeName == "CITE" || a.parentNode?.nodeName == "I" || a.parentNode?.nodeName == "small") return false;
     }
@@ -131,7 +168,7 @@ export class AppComponent implements OnInit {
   }
 
   getNameFromUrl(url: string) {
-    return url.replace('/wiki/', '')
+    return decodeURI(url.replace('/wiki/', '').replaceAll('(', '').replaceAll(')', '').normalize('NFC'))
   }
 
   colorEdge(tId: string) {
@@ -140,7 +177,7 @@ export class AppComponent implements OnInit {
   }
 
   colorTextNode(nId: string) {
-    return (this.edgesUtilizadas.map(e => e.source).includes(nId) || this.edgesUtilizadas.map(e => e.target).includes(nId)) ? 'black' : '#CCCCCC'
+    return (this.edgesUtilizadas.map(e => e.source).includes(nId) || this.edgesUtilizadas.map(e => e.target).includes(nId)) ? 'black' : '#A69E9C'
   }
 
   colorNode(nId: string) {

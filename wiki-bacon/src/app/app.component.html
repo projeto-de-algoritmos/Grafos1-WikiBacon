@@ -3,12 +3,14 @@
         <mat-card class="mat-elevation-z4">
             <mat-card-title class="text-center mt-3">WikiBacon - Grafos 1</mat-card-title>
             <mat-card-content>
-                <mat-tab-group dynamicHeight [selectedIndex]="0">
+                <mat-tab-group dynamicHeight [selectedIndex]="selectedIndex">
                     <mat-tab [formGroup]="form" label="Início" class="p-3">
                         <p class="m-0 text-center"> Quer testar o <span
                                 matTooltip="Define a quantos graus de distância um ator ou atriz está de Kevin Bacon. Aqui nesse projeto, será a distância entre duas páginas da Wikipedia."
                                 style="color: rgb(0, 68, 255)">Nr. de Kevin Bacon</span> entre duas páginas da
                             Wikipedia? <br> Então, vamos começar.</p>
+                        <p class="text-center">Por limitação de hardware e da biblioteca utilizada, vamos limitar a
+                            busca nos primeiros 5 links de cada página.</p>
                         <div class="row p-3">
                             <mat-form-field class="col-lg-4" appearance="outline">
                                 <mat-label>Página de Origem</mat-label>
@@ -27,18 +29,20 @@
                         </div>
                         <div class="row d-flex justify-content-center">
                             <div class="col-lg-6 d-flex justify-content-center">
-                                <button color="primary" (click)="send()" mat-raised-button>Enviar</button>
+                                <button [disabled]="form.invalid||loadingStatus" color="primary" (click)="send()" mat-raised-button>
+                                    <div class="d-flex align-items-center gap-2">
+                                        {{statusBotao}}
+                                        <mat-spinner *ngIf="loadingStatus" [diameter]="15"></mat-spinner>
+                                    </div>
+                                </button>
                             </div>
                         </div>
-                        <div>{{htmlPaginaOrigem}}</div>
-                        <div>{{htmlPaginaDestino}}</div>
                     </mat-tab>
                     <mat-tab class="d-flex justify-content-center" label="Resultado" class="p-3"
                         style="width: 100%; height: 100%">
-                        <ngx-graph [autoZoom]="false" [view]="[1280,720]" [zoomLevel]="1"
-                            [showMiniMap]="true" [autoCenter]="false" [update$]="update$" [nodes]="nodes"
-                            [links]="edges" layout="d3ForceDirected" [animate]="true" [enableZoom]="false"
-                            [draggingEnabled]="true">
+                        <ngx-graph [panOnZoom]="true" [view]="[1280,720]" [zoomLevel]="0.6" [showMiniMap]="true"
+                            [autoCenter]="false" [update$]="update$" [nodes]="nodes" [links]="edges"
+                            layout="colaForceDirected" [animate]="false" [enableZoom]="true" [draggingEnabled]="true">
                             <ng-template #defsTemplate>
                                 <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4"
                                     markerHeight="4" orient="auto">
@@ -49,8 +53,8 @@
                                 <svg:g class="node">
                                     <svg:rect [attr.width]="node.dimension.width" [attr.height]="node.dimension.height"
                                         [attr.fill]="colorNode(node.id)" />
-                                    <svg:text [attr.stroke]="colorTextNode(node.id)" alignment-baseline="central" [attr.x]="10"
-                                        [attr.y]="node.dimension.height / 2">
+                                    <svg:text [attr.stroke]="colorTextNode(node.id)" alignment-baseline="central"
+                                        [attr.x]="10" [attr.y]="node.dimension.height / 2">
                                         {{node.label}}
                                     </svg:text>
                                 </svg:g>
@@ -60,7 +64,8 @@
 
                                 <svg:g class="edge">
                                     <svg:path [attr.stroke]="colorEdge(link.id)" class="line" stroke-width="2"
-                                         marker-end="url(#arrow)"></svg:path>
+                                        marker-end="url(#arrow)">
+                                    </svg:path>
                                     <svg:text class="edge-label" text-anchor="middle">
                                         <textPath class="text-path" [attr.href]="'#' + link.id"
                                             [style.dominant-baseline]="link.dominantBaseline" startOffset="50%">

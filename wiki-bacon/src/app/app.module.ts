@@ -16,7 +16,8 @@ import { MatTabsModule } from "@angular/material/tabs"
 import { NgxGraphModule } from '@swimlane/ngx-graph';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
-
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 @NgModule({
   declarations: [
     AppComponent
@@ -34,10 +35,12 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatIconModule,
     MatTooltipModule,
     MatExpansionModule,
+    MatProgressSpinnerModule,
     MatTabsModule,
     NgxGraphModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]
