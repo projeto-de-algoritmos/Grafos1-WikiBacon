@@ -47,7 +47,7 @@ export class AppComponent implements OnInit {
     for (let i = 0; i < nodesUtilizados.length - 2; i++) {
       this.edgesUtilizadas.push(this.edges.find(e => e.source == nodesUtilizados[i] && e.target == nodesUtilizados[i + 1])!)
     }
-
+    console.log(this.edgesUtilizadas)
     this.update$.next
   }
 
@@ -135,7 +135,16 @@ export class AppComponent implements OnInit {
   }
 
   colorEdge(tId: string) {
-    const color = this.edgesUtilizadas.map(e => e.id).includes(tId) ? 'red' : 'black'
+    const color = this.edgesUtilizadas.map(e => e.id).includes(tId) ? '#0012FF' : '#CCCCCC'
     return color;
   }
+
+  colorTextNode(nId: string) {
+    return (this.edgesUtilizadas.map(e => e.source).includes(nId) || this.edgesUtilizadas.map(e => e.target).includes(nId)) ? 'black' : '#CCCCCC'
+  }
+
+  colorNode(nId: string) {
+    return (this.edgesUtilizadas.map(e => e.source).includes(nId) || this.edgesUtilizadas.map(e => e.target).includes(nId)) ? this.nodes.find(n => n.id == nId)?.data.color : '#CCCCCC'
+  }
+
 }
