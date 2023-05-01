@@ -1,6 +1,5 @@
 # Wiki Bacon
 
-**Número da Lista**: X<br>
 **Conteúdo da Disciplina**: Grafos 1<br>
 
 ## Alunos
@@ -64,7 +63,3 @@ Ele deverá digitar no campo "Página Origem" do formulário apenas: `Kevin_Baco
 Seguindo o padrão encontrado após o path "/wiki/" da url.
 
 Após preencher todos os campos, basta clicar em `Enviar` que o algoritmo começará a rodar e, após alguns segundos, irá retornar o grafo gerado.
-
-## Outros
-
-Quaisquer outras informações sobre seu projeto podem ser descritas abaixo.
